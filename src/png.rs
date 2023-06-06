@@ -1,24 +1,23 @@
 use core::fmt;
-use std::str::from_utf8;
 
-use crate::{chunk::Chunk, chunk_type::ChunkType, Error};
+use crate::{chunk::Chunk, Error};
 
-struct Png {
+pub struct Png {
     chunks: Vec<Chunk>,
 }
 
 impl Png {
     pub const STANDARD_HEADER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
 
-    fn from_chunks(chunks: Vec<Chunk>) -> Png {
+    pub fn from_chunks(chunks: Vec<Chunk>) -> Png {
         Png { chunks }
     }
 
-    fn append_chunk(&mut self, chunk: Chunk) {
+    pub fn append_chunk(&mut self, chunk: Chunk) {
         self.chunks.push(chunk)
     }
 
-    fn remove_chunk(&mut self, chunk_type: &str) -> Result<Chunk, Error> {
+    pub fn remove_chunk(&mut self, chunk_type: &str) -> Result<Chunk, Error> {
         for (i, chunk) in self.chunks.iter().enumerate() {
             if chunk.chunk_type().to_string() == chunk_type {
                 return Ok(self.chunks.remove(i));
@@ -31,11 +30,11 @@ impl Png {
         &Png::STANDARD_HEADER
     }
 
-    fn chunks(&self) -> &[Chunk] {
+    pub fn chunks(&self) -> &[Chunk] {
         &self.chunks
     }
 
-    fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
+    pub fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
         for (i, chunk) in self.chunks.iter().enumerate() {
             if chunk.chunk_type().to_string() == chunk_type {
                 return Some(&self.chunks[i]);
@@ -44,7 +43,7 @@ impl Png {
         None
     }
 
-    fn as_bytes(&self) -> Vec<u8> {
+    pub fn as_bytes(&self) -> Vec<u8> {
         let mut result: Vec<u8> = Vec::new();
         result.extend_from_slice(&Png::STANDARD_HEADER);
         let chunks_bytes_vec: Vec<u8> = self
