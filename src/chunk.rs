@@ -8,7 +8,7 @@ use crc::{Crc, CRC_32_ISO_HDLC};
 use crate::{chunk_type::ChunkType, Error};
 
 #[derive(Debug, Clone)]
-struct Chunk {
+pub struct Chunk {
     chunk_type: ChunkType,
     chunk_data: Vec<u8>,
 }
@@ -31,7 +31,6 @@ impl Chunk {
         let mut crc_calc: Vec<u8> = Vec::new();
         crc_calc.extend_from_slice(self.chunk_type().bytes().as_ref());
         crc_calc.extend_from_slice(self.data().as_ref());
-        println!("{}", from_utf8(crc_calc.as_ref()).unwrap());
         Chunk::CRC_INSTANCE.checksum(&crc_calc)
     }
 
@@ -74,7 +73,6 @@ impl TryFrom<&[u8]> for Chunk {
         let crc: u32 = u32::from_be_bytes(crc_bytes.try_into()?);
 
         let new = Chunk::new(chunk_type, chunk_data.into());
-        println!("{}", new.crc());
         if new.crc() != crc {
             return Err(Error::from("CRC validation error"));
         }
